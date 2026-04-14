@@ -1,0 +1,10 @@
+{
+  "project": "server-monitor-api",
+  "base": 7000,
+  "app": 7000,
+  "admin": 7001,
+  "debug": 7002,
+  "mysql": 7032,
+  "redis": 7079,
+  "postgres": 7432
+}

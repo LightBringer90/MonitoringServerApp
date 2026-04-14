@@ -1,0 +1,4 @@
+project: server-monitor-api
+template: python-fastapi-postgres
+git_provider: not-set
+remote_origin: not-set
