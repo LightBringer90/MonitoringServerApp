@@ -62,6 +62,23 @@ class TelemetryHistoryResponse(BaseModel):
     items: List[TelemetrySnapshotResponse] = Field(description="Recent persisted telemetry snapshots.")
 
 
+class TelemetryTrendPoint(BaseModel):
+    created_at: str = Field(description="Timestamp when the snapshot was persisted.")
+    cpu_percent: float = Field(description="Captured CPU utilization percentage.")
+    memory_percent: float = Field(description="Captured memory utilization percentage.")
+    total_processes: int = Field(description="Visible process count in the snapshot.")
+
+
+class TelemetryTrendWindow(BaseModel):
+    points: List[TelemetryTrendPoint] = Field(description="Chronological points used for trend analysis.")
+    cpu_average: float = Field(description="Average CPU utilization across the selected window.")
+    cpu_peak: float = Field(description="Peak CPU utilization across the selected window.")
+    memory_average: float = Field(description="Average memory utilization across the selected window.")
+    memory_peak: float = Field(description="Peak memory utilization across the selected window.")
+    process_average: float = Field(description="Average visible process count across the selected window.")
+    latest_created_at: str | None = Field(default=None, description="Timestamp of the newest point in the selected window.")
+
+
 class SystemSummaryResponse(BaseModel):
     hostname: str = Field(description="Visible hostname for the running container or host context.")
     platform: str = Field(description="Operating system and kernel/platform descriptor.")

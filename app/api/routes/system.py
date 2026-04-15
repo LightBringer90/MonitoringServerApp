@@ -11,9 +11,10 @@ from app.schemas.system import (
     SystemStatsResponse,
     SystemSummaryResponse,
     TelemetryHistoryResponse,
+    TelemetryTrendWindow,
 )
 from app.services.system_service import get_system_stats
-from app.services.telemetry_service import get_recent_history, record_snapshot
+from app.services.telemetry_service import get_recent_history, get_trend_window, record_snapshot
 
 router = APIRouter(prefix="/api/system", tags=["system"])
 
@@ -62,6 +63,21 @@ def telemetry_history(
     db: Session = Depends(get_db),
 ) -> TelemetryHistoryResponse:
     return get_recent_history(db, limit)
+
+
+@router.get(
+    "/trends",
+    response_model=TelemetryTrendWindow,
+    summary="Read telemetry trend window",
+    description="Returns a compact trend window with aggregates that dashboards can use for recent CPU, memory, and process trend summaries.",
+    responses=common_error_responses,
+)
+def telemetry_trends(
+    _token: str = Depends(require_token),
+    limit: int = Query(default=12, ge=1, le=120),
+    db: Session = Depends(get_db),
+) -> TelemetryTrendWindow:
+    return get_trend_window(db, limit)
 
 
 @router.get(

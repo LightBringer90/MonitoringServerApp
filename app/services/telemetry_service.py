@@ -4,7 +4,13 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.models.telemetry import TelemetrySnapshot
-from app.schemas.system import SystemStatsResponse, TelemetryHistoryResponse, TelemetrySnapshotResponse
+from app.schemas.system import (
+    SystemStatsResponse,
+    TelemetryHistoryResponse,
+    TelemetrySnapshotResponse,
+    TelemetryTrendPoint,
+    TelemetryTrendWindow,
+)
 
 
 def prune_old_snapshots(db: Session, retention_limit: int) -> None:
@@ -56,4 +62,45 @@ def get_recent_history(db: Session, limit: int) -> TelemetryHistoryResponse:
             )
             for row in rows
         ]
+    )
+
+
+
+def get_trend_window(db: Session, limit: int) -> TelemetryTrendWindow:
+    rows = db.execute(
+        select(TelemetrySnapshot).order_by(TelemetrySnapshot.created_at.desc()).limit(limit)
+    ).scalars().all()
+    chronological_rows = list(reversed(rows))
+
+    if not chronological_rows:
+        return TelemetryTrendWindow(
+            points=[],
+            cpu_average=0.0,
+            cpu_peak=0.0,
+            memory_average=0.0,
+            memory_peak=0.0,
+            process_average=0.0,
+            latest_created_at=None,
+        )
+
+    cpu_values = [row.cpu_percent for row in chronological_rows]
+    memory_values = [row.memory_percent for row in chronological_rows]
+    process_values = [row.total_processes for row in chronological_rows]
+
+    return TelemetryTrendWindow(
+        points=[
+            TelemetryTrendPoint(
+                created_at=row.created_at.isoformat(),
+                cpu_percent=row.cpu_percent,
+                memory_percent=row.memory_percent,
+                total_processes=row.total_processes,
+            )
+            for row in chronological_rows
+        ],
+        cpu_average=sum(cpu_values) / len(cpu_values),
+        cpu_peak=max(cpu_values),
+        memory_average=sum(memory_values) / len(memory_values),
+        memory_peak=max(memory_values),
+        process_average=sum(process_values) / len(process_values),
+        latest_created_at=chronological_rows[-1].created_at.isoformat(),
     )

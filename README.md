@@ -9,10 +9,12 @@ A modular FastAPI-based server monitoring backend.
 - `/api/system` protected with token auth
 - `/api/system/summary` protected with token auth
 - `/api/system/history` protected with token auth
+- `/api/system/trends` protected with token auth
 - `/api/system/snapshot` protected with token auth
 - `/api/system/basic` protected with HTTP Basic auth
 - CPU, memory, disk, network, and process summary metrics
 - persisted telemetry history stored in SQLite inside Docker volume-backed app data
+- trend-window endpoint with CPU, memory, and process aggregates for dashboard summaries
 - explicit metadata about monitoring scope in container runtime
 
 ## Run
@@ -29,6 +31,7 @@ docker compose up -d --build
 - `GET /api/system/summary`
 - `GET /api/system`
 - `GET /api/system/history`
+- `GET /api/system/trends`
 - `POST /api/system/snapshot`
 
 Recommended auth for dashboards:
