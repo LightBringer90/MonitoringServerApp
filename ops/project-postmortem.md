@@ -2,52 +2,33 @@
 
 Project: server-monitor-api
 Date: 2026-04-14
-Phase reached: first real project through factory
+Phase reached: functional backend monitoring service with persisted telemetry
 
 ## What worked
-- Docker-native bootstrap and project creation worked
 - modular FastAPI structure was established cleanly
 - auth, health, and system metrics endpoints worked
+- persisted telemetry and history endpoints improved usefulness
 - project ran successfully through Docker Compose
-- this project proved the factory can produce a real backend service
+- dashboard-consumer endpoints supported the monitoring UI integration well
 
 ## What failed or was weaker than expected
-- disk monitoring logic did not behave as expected in container context
-- earlier generated samples exposed timing and template polish gaps
-- some Makefile/health assumptions needed correction once port allocation became real
-
-## Which agent roles were exercised
-- Senior API Architect
-- Senior Backend Implementer
-- Senior DevOps and Deployment Engineer
-- Senior Documentation and Developer Experience Agent
-- partial Senior QA and Test Engineer
-- light Senior Security Reviewer
-
-## Which agent roles should have done better
-- Senior QA and Test Engineer should push harder on container-context behavior, not just happy-path startup
-- Senior DevOps and Deployment Engineer should detect host-vs-container metric visibility issues earlier
-- Senior API Architect should explicitly call out container observability constraints up front for host-monitoring tools
-
-## Template or factory issues found
-- Go template originally missed go.sum
-- health checks initially assumed container default ports instead of allocated host ports
-- older generated samples became stale relative to newer template standards
+- disk monitoring logic needed refinement in container context
+- observability scope was initially too easy to misread as host-wide
+- smoke testing started lighter than it should have
+- richer trend and analytics capability is still limited
 
 ## Operational issues found
-- Docker was a hard prerequisite for the factory and had to be installed later
-- Telegram exec approvals required real configuration work before elevated commands flowed smoothly
-- reboot exposed that the old host-side monitor was not properly persisted until systemd was fixed
+- container-visible metrics are not the same as host-wide observability
+- runtime configuration had to be tightened as the service became richer
+- persistence and retention behavior needed explicit operational handling
 
 ## Documentation issues found
-- early team-model docs were too layered and had to be consolidated to the single 11-agent model
-- operator expectations needed to be clarified more explicitly in runbooks and standards
+- observability scope needed clearer explanation
+- deploy notes had to catch up with the richer persisted-monitoring shape
+- endpoint/auth behavior needed clearer operator-facing explanation
 
-## What should be changed in the factory
-- strengthen project postmortem and learning capture as standard behavior
-- keep validating templates through real generated projects
-- improve container-aware monitoring patterns for host-observability tools
-
-## What should be changed in the team model
-- elite agents should be measured by the quality of their judgment under real conditions, not just by role naming
-- real projects should feed continuous upgrades to playbooks, gates, and templates
+## Next improvements for this project
+- add deeper automated tests beyond smoke-path checks
+- improve trend and aggregation capabilities
+- consider a stronger migration story if persistence complexity grows
+- continue improving operational clarity around scope and runtime assumptions
