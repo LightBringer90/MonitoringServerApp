@@ -2,4 +2,5 @@ fastapi==0.115.12
 uvicorn[standard]==0.34.2
 psutil==7.0.0
 pydantic==2.11.3
+sqlalchemy==2.0.40
 pytest==8.3.5

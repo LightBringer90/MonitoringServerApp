@@ -8,6 +8,8 @@ services:
       - .env
     ports:
       - "7000:7000"
+    volumes:
+      - ./data:/app/data
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7000/health')"]
       interval: 10s

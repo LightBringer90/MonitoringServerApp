@@ -1,6 +1,6 @@
 # server-monitor-api
 
-A modular FastAPI-based server monitoring backend built inside the backend factory.
+A modular FastAPI-based server monitoring backend.
 
 ## Features
 - `/`
@@ -8,8 +8,11 @@ A modular FastAPI-based server monitoring backend built inside the backend facto
 - `/health/ready`
 - `/api/system` protected with token auth
 - `/api/system/summary` protected with token auth
+- `/api/system/history` protected with token auth
+- `/api/system/snapshot` protected with token auth
 - `/api/system/basic` protected with HTTP Basic auth
 - CPU, memory, disk, network, and process summary metrics
+- persisted telemetry history stored in SQLite inside Docker volume-backed app data
 - explicit metadata about monitoring scope in container runtime
 
 ## Run
@@ -25,6 +28,8 @@ docker compose up -d --build
 - `GET /health/ready`
 - `GET /api/system/summary`
 - `GET /api/system`
+- `GET /api/system/history`
+- `POST /api/system/snapshot`
 
 Recommended auth for dashboards:
 - `X-Monitor-Token: <token>`
