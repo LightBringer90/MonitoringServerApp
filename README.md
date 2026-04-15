@@ -40,6 +40,7 @@ SMTP is exposed at:
 - `GET /api/system/history`
 - `GET /api/system/trends`
 - `POST /api/system/snapshot`
+- `POST /api/system/alerts/test`
 
 Recommended auth for dashboards:
 - `X-Monitor-Token: <token>`
@@ -55,6 +56,9 @@ It returns `503` when critical runtime configuration is still unsafe, for exampl
 ## Email alerts
 
 The service can send failure reports and threshold alerts through Mailpit or another SMTP server.
+A token-protected test endpoint is also available for end-to-end verification:
+- `POST /api/system/alerts/test`
+
 Set these values in `.env`:
 - `ALERT_EMAIL_ENABLED=true`
 - `SMTP_HOST`

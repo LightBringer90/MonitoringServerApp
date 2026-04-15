@@ -13,6 +13,7 @@ from app.schemas.system import (
     TelemetryHistoryResponse,
     TelemetryTrendWindow,
 )
+from app.services.alert_service import send_failure_report
 from app.services.system_service import get_system_stats
 from app.services.telemetry_service import get_recent_history, get_trend_window, record_snapshot
 
@@ -109,6 +110,18 @@ def system_summary(_token: str = Depends(require_token)) -> SystemSummaryRespons
         disk_count=len(stats.disks),
         scope=stats.meta.scope,
     )
+
+
+@router.post(
+    "/alerts/test",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Trigger a test alert email",
+    description="Sends a test alert email through the configured SMTP path so operators can verify end-to-end alert delivery.",
+    responses=common_error_responses,
+)
+def trigger_test_alert(_token: str = Depends(require_token)) -> dict[str, str]:
+    send_failure_report("Operator-triggered test alert")
+    return {"status": "queued", "detail": "Test alert email sent"}
 
 
 @router.get(
