@@ -5,7 +5,7 @@ services:
     build: .
     restart: unless-stopped
     env_file:
-      - .env
+      - ${MONITOR_ENV_FILE:-.env}
     ports:
       - "7000:7000"
     volumes:
@@ -15,6 +15,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    depends_on:
+      - mailpit
+    networks:
+      - internal
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - internal
 

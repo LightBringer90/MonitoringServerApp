@@ -15,6 +15,7 @@ from app.api.routes.health import router as health_router
 from app.api.routes.system import router as system_router
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, engine
+from app.services.alert_service import send_failure_report, send_threshold_report, threshold_reasons
 from app.services.system_service import get_system_stats
 from app.services.telemetry_service import record_snapshot
 
@@ -38,8 +39,11 @@ def snapshot_worker() -> None:
         try:
             stats = get_system_stats()
             record_snapshot(db, stats, settings.snapshot_retention_limit)
-        except Exception:
-            pass
+            reasons = threshold_reasons(stats)
+            if reasons:
+                send_threshold_report(stats, reasons)
+        except Exception as exc:
+            send_failure_report(str(exc))
         finally:
             db.close()
         time.sleep(settings.snapshot_interval_seconds)

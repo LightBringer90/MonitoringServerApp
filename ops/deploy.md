@@ -11,8 +11,11 @@
 - Confirm `data/` volume path is writable
 - Build and start the stack
 - Verify `/health`
+- Verify `/health/ready`
+- Confirm readiness does not report placeholder-secret issues
 - Verify `POST /api/system/snapshot`
 - Verify `GET /api/system/history`
+- Verify `GET /api/system/trends`
 
 ## Rollback notes
 - If the upgraded service fails, restore the prior image/build and preserve `./data/`
@@ -21,6 +24,8 @@
 
 ## Post-deploy verification
 - Check `/health`
+- Check `/health/ready`
 - Capture a snapshot
 - Verify history returns recent persisted data
-- Verify dashboard on port 4280 can read summary/history and capture snapshots
+- Verify trend summaries return recent aggregate data
+- Verify dashboard on port 4280 can read summary/history/trends and capture snapshots

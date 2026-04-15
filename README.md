@@ -5,7 +5,7 @@ A modular FastAPI-based server monitoring backend.
 ## Features
 - `/`
 - `/health`
-- `/health/ready`
+- `/health/ready` (fails when critical config is still using placeholder secrets)
 - `/api/system` protected with token auth
 - `/api/system/summary` protected with token auth
 - `/api/system/history` protected with token auth
@@ -15,6 +15,7 @@ A modular FastAPI-based server monitoring backend.
 - CPU, memory, disk, network, and process summary metrics
 - persisted telemetry history stored in SQLite inside Docker volume-backed app data
 - trend-window endpoint with CPU, memory, and process aggregates for dashboard summaries
+- optional Mailpit-backed failure and threshold email reporting
 - explicit metadata about monitoring scope in container runtime
 
 ## Run
@@ -23,6 +24,12 @@ A modular FastAPI-based server monitoring backend.
 cp .env.example .env
 docker compose up -d --build
 ```
+
+Mailpit UI is available at:
+- `http://127.0.0.1:8025`
+
+SMTP is exposed at:
+- `127.0.0.1:1025`
 
 ## Dashboard-facing endpoints
 
@@ -39,6 +46,23 @@ Recommended auth for dashboards:
 
 Legacy/basic-auth endpoint:
 - `GET /api/system/basic`
+
+## Readiness behavior
+
+The readiness endpoint is stricter than liveness.
+It returns `503` when critical runtime configuration is still unsafe, for example when placeholder secrets such as `change-me-token` are still in use.
+
+## Email alerts
+
+The service can send failure reports and threshold alerts through Mailpit or another SMTP server.
+Set these values in `.env`:
+- `ALERT_EMAIL_ENABLED=true`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `ALERT_EMAIL_FROM`
+- `ALERT_EMAIL_TO`
+- `CPU_ALERT_THRESHOLD`
+- `MEMORY_ALERT_THRESHOLD`
 
 ## Test health
 
