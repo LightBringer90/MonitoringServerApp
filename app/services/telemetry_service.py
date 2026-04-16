@@ -135,3 +135,12 @@ def get_telemetry_freshness(db: Session, stale_after_seconds: int) -> TelemetryF
         stale_after_seconds=stale_after_seconds,
         history_points_checked=1,
     )
+
+
+def telemetry_readiness_issues(db: Session, stale_after_seconds: int) -> list[str]:
+    freshness = get_telemetry_freshness(db, stale_after_seconds)
+    if freshness.status == "stale" and freshness.snapshot_age_seconds is not None:
+        return [
+            f"Persisted telemetry is stale ({freshness.snapshot_age_seconds:.0f}s old, stale after {stale_after_seconds}s)"
+        ]
+    return []

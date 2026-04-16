@@ -4,6 +4,8 @@ from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
+from app.core.database import SessionLocal
+from app.services.telemetry_service import telemetry_readiness_issues
 
 router = APIRouter(tags=["health"])
 
@@ -16,6 +18,11 @@ def health():
 @router.get("/health/ready", summary="Readiness probe", description="Endpoint confirming that the API is ready to serve requests.")
 def ready():
     issues = settings.readiness_issues()
+    db = SessionLocal()
+    try:
+        issues.extend(telemetry_readiness_issues(db, settings.telemetry_stale_after_seconds))
+    finally:
+        db.close()
     if issues:
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

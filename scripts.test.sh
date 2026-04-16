@@ -38,10 +38,16 @@ MONITOR_MAILPIT_UI_PORT="$TEST_MAILPIT_UI_PORT" \
 MONITOR_MAILPIT_SMTP_PORT="$TEST_MAILPIT_SMTP_PORT" \
 MONITOR_DATA_DIR="$TEST_DATA_DIR" \
 docker compose -p "$TEST_PROJECT_NAME" --env-file "$TEST_ENV_FILE" up -d --build
-sleep 10
+for _ in $(seq 1 60); do
+  if curl -fsS "http://127.0.0.1:${TEST_APP_PORT}/health" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
 curl -fsS "http://127.0.0.1:${TEST_APP_PORT}/health" >/dev/null
 curl -fsS "http://127.0.0.1:${TEST_APP_PORT}/health/ready" >/dev/null
 curl -fsS -X POST -H 'X-Monitor-Token: monitor-test-token-01' "http://127.0.0.1:${TEST_APP_PORT}/api/system/snapshot" >/dev/null
+curl -fsS "http://127.0.0.1:${TEST_APP_PORT}/health/ready" >/dev/null
 curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' "http://127.0.0.1:${TEST_APP_PORT}/api/system/history?limit=3" >/dev/null
 curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' "http://127.0.0.1:${TEST_APP_PORT}/api/system/trends?limit=3" >/dev/null
 FRESHNESS_JSON=$(curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' "http://127.0.0.1:${TEST_APP_PORT}/api/system/freshness")

@@ -68,6 +68,8 @@ Legacy/basic-auth endpoint:
 The readiness endpoint is stricter than liveness.
 It returns `503` when critical runtime configuration is still unsafe, for example when placeholder secrets such as `change-me-token` are still in use.
 
+It also fails when persisted telemetry is stale, because fresh telemetry is part of the service promise for this monitoring backend.
+
 ## Email alerts
 
 The service can send failure reports and threshold alerts through Mailpit or another SMTP server.
