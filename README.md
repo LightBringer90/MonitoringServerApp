@@ -27,6 +27,17 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
+## Safe test isolation
+
+The smoke-test flow is intentionally isolated from the live stack.
+It uses:
+- a separate Compose project name
+- separate host ports
+- a separate data directory
+- a separate test env file
+
+This is required so test runs do not contaminate live runtime state.
+
 Mailpit UI is available at:
 - `http://127.0.0.1:8025`
 
@@ -97,3 +108,5 @@ This helps distinguish calm metrics from stale metrics.
 
 ## Notes
 This service currently reports container-visible runtime metrics. Host-wide observability requires additional runtime design, such as explicit host mounts or different deployment scope.
+
+When testing on a machine that also hosts the live stack, do not reuse the live Compose namespace, ports, or data path for smoke runs.
