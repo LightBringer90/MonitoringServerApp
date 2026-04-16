@@ -7,13 +7,14 @@ from app.core.auth import require_auth, require_token
 from app.core.config import settings
 from app.core.database import get_db
 from app.schemas.system import (
+    AlertStatusResponse,
     ErrorResponse,
     SystemStatsResponse,
     SystemSummaryResponse,
     TelemetryHistoryResponse,
     TelemetryTrendWindow,
 )
-from app.services.alert_service import send_failure_report
+from app.services.alert_service import send_failure_report, threshold_reasons
 from app.services.system_service import get_system_stats
 from app.services.telemetry_service import get_recent_history, get_trend_window, record_snapshot
 
@@ -108,6 +109,29 @@ def system_summary(_token: str = Depends(require_token)) -> SystemSummaryRespons
         cpu_percent=stats.cpu.percent,
         memory_percent=stats.memory.percent,
         disk_count=len(stats.disks),
+        scope=stats.meta.scope,
+    )
+
+
+@router.get(
+    "/alerts/status",
+    response_model=AlertStatusResponse,
+    summary="Read current alert status",
+    description="Evaluates the current CPU and memory readings against configured thresholds and returns a compact operator-facing alert posture.",
+    responses=common_error_responses,
+)
+def alert_status(_token: str = Depends(require_token)) -> AlertStatusResponse:
+    stats = get_system_stats()
+    reasons = threshold_reasons(stats)
+    return AlertStatusResponse(
+        status="warning" if reasons else "ok",
+        hostname=stats.hostname,
+        cpu_percent=stats.cpu.percent,
+        memory_percent=stats.memory.percent,
+        cpu_threshold=settings.cpu_alert_threshold,
+        memory_threshold=settings.memory_alert_threshold,
+        reasons=reasons,
+        alert_email_enabled=settings.alert_email_enabled,
         scope=stats.meta.scope,
     )
 

@@ -30,6 +30,17 @@ curl -fsS http://127.0.0.1:7000/health/ready >/dev/null
 curl -fsS -X POST -H 'X-Monitor-Token: monitor-test-token-01' http://127.0.0.1:7000/api/system/snapshot >/dev/null
 curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' 'http://127.0.0.1:7000/api/system/history?limit=3' >/dev/null
 curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' 'http://127.0.0.1:7000/api/system/trends?limit=3' >/dev/null
+ALERT_STATUS_JSON=$(curl -fsS -H 'X-Monitor-Token: monitor-test-token-01' http://127.0.0.1:7000/api/system/alerts/status)
+ALERT_STATUS_JSON="$ALERT_STATUS_JSON" python3 - <<'PY'
+import json
+import os
+payload = json.loads(os.environ['ALERT_STATUS_JSON'])
+if payload.get('status') not in {'ok', 'warning'}:
+    raise SystemExit('unexpected alert status payload')
+if 'alert_email_enabled' not in payload:
+    raise SystemExit('missing alert status field')
+print('alert status smoke ok')
+PY
 curl -fsS -X POST -H 'X-Monitor-Token: monitor-test-token-01' http://127.0.0.1:7000/api/system/alerts/test >/dev/null
 sleep 2
 MAILPIT_MESSAGES_JSON=$(curl -fsS http://127.0.0.1:8025/api/v1/messages)

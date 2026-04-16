@@ -89,6 +89,18 @@ class SystemSummaryResponse(BaseModel):
     scope: str = Field(description="Observability scope for the summary payload.")
 
 
+class AlertStatusResponse(BaseModel):
+    status: str = Field(description="Current alert posture such as ok or warning.")
+    hostname: str = Field(description="Visible hostname for the running container or host context.")
+    cpu_percent: float = Field(description="Current CPU utilization percentage.")
+    memory_percent: float = Field(description="Current memory utilization percentage.")
+    cpu_threshold: float = Field(description="Configured CPU alert threshold percentage.")
+    memory_threshold: float = Field(description="Configured memory alert threshold percentage.")
+    reasons: List[str] = Field(description="Threshold reasons that currently place the system in warning state.")
+    alert_email_enabled: bool = Field(description="Whether email alert delivery is enabled in the current runtime.")
+    scope: str = Field(description="Observability scope for the alert evaluation payload.")
+
+
 class ErrorResponse(BaseModel):
     detail: str = Field(description="Machine-readable or operator-readable error message.")
 

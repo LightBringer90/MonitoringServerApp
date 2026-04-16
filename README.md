@@ -12,6 +12,7 @@ A modular FastAPI-based server monitoring backend.
 - `/api/system/trends` protected with token auth
 - `/api/system/snapshot` protected with token auth
 - `/api/system/basic` protected with HTTP Basic auth
+- `/api/system/alerts/status` protected with token auth
 - CPU, memory, disk, network, and process summary metrics
 - persisted telemetry history stored in SQLite inside Docker volume-backed app data
 - trend-window endpoint with CPU, memory, and process aggregates for dashboard summaries
@@ -40,6 +41,7 @@ SMTP is exposed at:
 - `GET /api/system/history`
 - `GET /api/system/trends`
 - `POST /api/system/snapshot`
+- `GET /api/system/alerts/status`
 - `POST /api/system/alerts/test`
 
 Recommended auth for dashboards:
@@ -56,6 +58,9 @@ It returns `503` when critical runtime configuration is still unsafe, for exampl
 ## Email alerts
 
 The service can send failure reports and threshold alerts through Mailpit or another SMTP server.
+A compact token-protected alert status endpoint is available for dashboards and operators:
+- `GET /api/system/alerts/status`
+
 A token-protected test endpoint is also available for end-to-end verification:
 - `POST /api/system/alerts/test`
 
