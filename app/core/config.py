@@ -30,6 +30,7 @@ class Settings(BaseModel):
     history_limit_default: int = Field(default=int(os.getenv("HISTORY_LIMIT_DEFAULT", "50")))
     snapshot_interval_seconds: int = Field(default=int(os.getenv("SNAPSHOT_INTERVAL_SECONDS", "60")))
     snapshot_retention_limit: int = Field(default=int(os.getenv("SNAPSHOT_RETENTION_LIMIT", "500")))
+    telemetry_stale_after_seconds: int = Field(default=int(os.getenv("TELEMETRY_STALE_AFTER_SECONDS", "180")))
     alert_email_enabled: bool = Field(default=os.getenv("ALERT_EMAIL_ENABLED", "false").lower() == "true")
     smtp_host: str = Field(default=os.getenv("SMTP_HOST", "mailpit"))
     smtp_port: int = Field(default=int(os.getenv("SMTP_PORT", "1025")))
@@ -64,6 +65,13 @@ class Settings(BaseModel):
     def validate_snapshot_retention_limit(cls, value: int) -> int:
         if value < 10 or value > 10000:
             raise ValueError("SNAPSHOT_RETENTION_LIMIT must be between 10 and 10000")
+        return value
+
+    @field_validator("telemetry_stale_after_seconds")
+    @classmethod
+    def validate_telemetry_stale_after_seconds(cls, value: int) -> int:
+        if value < 30 or value > 86400:
+            raise ValueError("TELEMETRY_STALE_AFTER_SECONDS must be between 30 and 86400")
         return value
 
     @field_validator("smtp_port")

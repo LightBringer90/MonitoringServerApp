@@ -101,6 +101,14 @@ class AlertStatusResponse(BaseModel):
     scope: str = Field(description="Observability scope for the alert evaluation payload.")
 
 
+class TelemetryFreshnessResponse(BaseModel):
+    status: str = Field(description="Freshness posture such as fresh, stale, or missing.")
+    latest_created_at: str | None = Field(default=None, description="Timestamp of the latest persisted telemetry snapshot when one exists.")
+    snapshot_age_seconds: float | None = Field(default=None, description="Age in seconds of the latest persisted snapshot when one exists.")
+    stale_after_seconds: int = Field(description="Configured threshold after which telemetry is considered stale.")
+    history_points_checked: int = Field(description="Number of recent snapshots inspected for freshness evaluation.")
+
+
 class ErrorResponse(BaseModel):
     detail: str = Field(description="Machine-readable or operator-readable error message.")
 

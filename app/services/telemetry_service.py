@@ -1,11 +1,14 @@
 """Persistence helpers for telemetry history."""
 
+from datetime import datetime, timezone
+
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.models.telemetry import TelemetrySnapshot
 from app.schemas.system import (
     SystemStatsResponse,
+    TelemetryFreshnessResponse,
     TelemetryHistoryResponse,
     TelemetrySnapshotResponse,
     TelemetryTrendPoint,
@@ -103,4 +106,32 @@ def get_trend_window(db: Session, limit: int) -> TelemetryTrendWindow:
         memory_peak=max(memory_values),
         process_average=sum(process_values) / len(process_values),
         latest_created_at=chronological_rows[-1].created_at.isoformat(),
+    )
+
+
+def get_telemetry_freshness(db: Session, stale_after_seconds: int) -> TelemetryFreshnessResponse:
+    latest = db.execute(
+        select(TelemetrySnapshot).order_by(TelemetrySnapshot.created_at.desc()).limit(1)
+    ).scalars().first()
+
+    if latest is None:
+        return TelemetryFreshnessResponse(
+            status="missing",
+            latest_created_at=None,
+            snapshot_age_seconds=None,
+            stale_after_seconds=stale_after_seconds,
+            history_points_checked=0,
+        )
+
+    created_at = latest.created_at
+    if created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=timezone.utc)
+    age_seconds = (datetime.now(timezone.utc) - created_at).total_seconds()
+
+    return TelemetryFreshnessResponse(
+        status="stale" if age_seconds > stale_after_seconds else "fresh",
+        latest_created_at=created_at.isoformat(),
+        snapshot_age_seconds=age_seconds,
+        stale_after_seconds=stale_after_seconds,
+        history_points_checked=1,
     )

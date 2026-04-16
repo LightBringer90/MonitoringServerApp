@@ -11,12 +11,13 @@ from app.schemas.system import (
     ErrorResponse,
     SystemStatsResponse,
     SystemSummaryResponse,
+    TelemetryFreshnessResponse,
     TelemetryHistoryResponse,
     TelemetryTrendWindow,
 )
 from app.services.alert_service import send_failure_report, threshold_reasons
 from app.services.system_service import get_system_stats
-from app.services.telemetry_service import get_recent_history, get_trend_window, record_snapshot
+from app.services.telemetry_service import get_recent_history, get_telemetry_freshness, get_trend_window, record_snapshot
 
 router = APIRouter(prefix="/api/system", tags=["system"])
 
@@ -80,6 +81,20 @@ def telemetry_trends(
     db: Session = Depends(get_db),
 ) -> TelemetryTrendWindow:
     return get_trend_window(db, limit)
+
+
+@router.get(
+    "/freshness",
+    response_model=TelemetryFreshnessResponse,
+    summary="Read telemetry freshness",
+    description="Reports whether persisted telemetry is fresh, stale, or missing so dashboards and operators can detect stale monitoring data.",
+    responses=common_error_responses,
+)
+def telemetry_freshness(
+    _token: str = Depends(require_token),
+    db: Session = Depends(get_db),
+) -> TelemetryFreshnessResponse:
+    return get_telemetry_freshness(db, settings.telemetry_stale_after_seconds)
 
 
 @router.get(

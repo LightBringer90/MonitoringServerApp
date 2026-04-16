@@ -10,6 +10,7 @@ A modular FastAPI-based server monitoring backend.
 - `/api/system/summary` protected with token auth
 - `/api/system/history` protected with token auth
 - `/api/system/trends` protected with token auth
+- `/api/system/freshness` protected with token auth
 - `/api/system/snapshot` protected with token auth
 - `/api/system/basic` protected with HTTP Basic auth
 - `/api/system/alerts/status` protected with token auth
@@ -40,6 +41,7 @@ SMTP is exposed at:
 - `GET /api/system`
 - `GET /api/system/history`
 - `GET /api/system/trends`
+- `GET /api/system/freshness`
 - `POST /api/system/snapshot`
 - `GET /api/system/alerts/status`
 - `POST /api/system/alerts/test`
@@ -85,6 +87,13 @@ make health
 MONITOR_TOKEN=change-me-token make system-token
 MONITOR_TOKEN=change-me-token make summary-token
 ```
+
+## Telemetry freshness
+
+Dashboards and operators can check whether persisted telemetry is fresh, stale, or missing:
+- `GET /api/system/freshness`
+
+This helps distinguish calm metrics from stale metrics.
 
 ## Notes
 This service currently reports container-visible runtime metrics. Host-wide observability requires additional runtime design, such as explicit host mounts or different deployment scope.
